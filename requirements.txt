@@ -1,0 +1,13 @@
+langchain
+langchain-ollama
+langgraph
+ollama
+fastapi
+uvicorn
+pandas
+chromadb
+sentence-transformers
+python-dotenv
+rich
+python-multipart
+pydantic-settings

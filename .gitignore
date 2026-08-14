@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables
+.env
+
+# Vector database
+data/chroma_db/
+
+# Reports (optional - remove this line if you want reports on GitHub)
+reports/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

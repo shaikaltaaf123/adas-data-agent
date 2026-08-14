@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAS Data Analysis Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0e1a;
+            color: #e0e6f0;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #0d1225;
+            border-bottom: 1px solid #1e2d4a;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            color: #4fc3f7;
+            font-weight: 600;
+        }
+
+        header span {
+            font-size: 0.8rem;
+            background: #1a3a5c;
+            color: #4fc3f7;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #0d1225;
+            border: 1px solid #1e2d4a;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            color: #4fc3f7;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .upload-area {
+            border: 2px dashed #1e2d4a;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #4fc3f7;
+            background: #0a1628;
+        }
+
+        .upload-area p {
+            color: #6b8cae;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-selected {
+            background: #0a2040;
+            border: 1px solid #4fc3f7;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #4fc3f7;
+            display: none;
+        }
+
+        button {
+            background: #1565c0;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #1976d2;
+        }
+
+        button:disabled {
+            background: #1e2d4a;
+            color: #4a6080;
+            cursor: not-allowed;
+        }
+
+        .status {
+            display: none;
+            background: #0a1628;
+            border: 1px solid #1e2d4a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .status-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: #6b8cae;
+            font-size: 0.9rem;
+        }
+
+        .status-step.active {
+            color: #4fc3f7;
+        }
+
+        .status-step.done {
+            color: #66bb6a;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1e2d4a;
+            flex-shrink: 0;
+        }
+
+        .dot.active {
+            background: #4fc3f7;
+            animation: pulse 1s infinite;
+        }
+
+        .dot.done {
+            background: #66bb6a;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .report-card {
+            display: none;
+        }
+
+        .report-content {
+            background: #070b14;
+            border: 1px solid #1e2d4a;
+            border-radius: 8px;
+            padding: 25px;
+            white-space: pre-wrap;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #c8d8e8;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #0a2040;
+            border: 1px solid #1e2d4a;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            color: #4fc3f7;
+        }
+
+        .reports-list {
+            list-style: none;
+        }
+
+        .reports-list li {
+            padding: 12px 15px;
+            border: 1px solid #1e2d4a;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+            color: #6b8cae;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reports-list li::before {
+            content: '📄';
+            font-size: 1rem;
+        }
+
+        .error {
+            background: #1a0a0a;
+            border: 1px solid #5c1a1a;
+            color: #ef5350;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.88rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>⚡ ADAS Data Analysis Agent</h1>
+        <span>v1.0 — Local AI</span>
+    </header>
+
+    <div class="container">
+
+        <!-- Upload Card -->
+        <div class="card">
+            <h2>Analyze Dataset</h2>
+
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div style="font-size: 2rem;">📂</div>
+                <p>Click to upload a CSV driving dataset</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Supports .csv files</p>
+            </div>
+
+            <input type="file" id="fileInput" accept=".csv" onchange="handleFileSelect(event)">
+            <div class="file-selected" id="fileSelected"></div>
+
+            <button id="analyzeBtn" onclick="analyzeFile()" disabled>
+                Run Analysis
+            </button>
+
+            <div class="error" id="errorBox"></div>
+
+            <!-- Status Steps -->
+            <div class="status" id="statusBox">
+                <div class="status-step" id="step1">
+                    <div class="dot" id="dot1"></div>
+                    Searching knowledge base...
+                </div>
+                <div class="status-step" id="step2">
+                    <div class="dot" id="dot2"></div>
+                    Analyzing ADAS data...
+                </div>
+                <div class="status-step" id="step3">
+                    <div class="dot" id="dot3"></div>
+                    Generating report...
+                </div>
+                <div class="status-step" id="step4">
+                    <div class="dot" id="dot4"></div>
+                    Indexing to knowledge base...
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Card -->
+        <div class="card report-card" id="reportCard">
+            <h2>Generated Report</h2>
+            <div class="report-meta" id="reportMeta"></div>
+            <div class="report-content" id="reportContent"></div>
+        </div>
+
+        <!-- Past Reports Card -->
+        <div class="card">
+            <h2>Past Reports</h2>
+            <ul class="reports-list" id="reportsList">
+                <li style="color: #3a5070;">Loading reports...</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedFile = null;
+        const API = 'http://localhost:8000';
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                const fileSelected = document.getElementById('fileSelected');
+                fileSelected.style.display = 'block';
+                fileSelected.textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`;
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+
+        function setStep(stepNum, state) {
+            const step = document.getElementById(`step${stepNum}`);
+            const dot = document.getElementById(`dot${stepNum}`);
+            step.className = `status-step ${state}`;
+            dot.className = `dot ${state}`;
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.style.display = 'block';
+            errorBox.textContent = `Error: ${message}`;
+        }
+
+        async function analyzeFile() {
+            if (!selectedFile) return;
+
+            // Reset UI
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('analyzeBtn').textContent = 'Analyzing...';
+            document.getElementById('errorBox').style.display = 'none';
+            document.getElementById('reportCard').style.display = 'none';
+            document.getElementById('statusBox').style.display = 'block';
+
+            // Reset steps
+            for (let i = 1; i <= 4; i++) setStep(i, '');
+
+            try {
+                setStep(1, 'active');
+                await new Promise(r => setTimeout(r, 500));
+
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                setStep(1, 'done');
+                setStep(2, 'active');
+
+                const response = await fetch(`${API}/analyze/file`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                setStep(2, 'done');
+                setStep(3, 'active');
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Analysis failed');
+                }
+
+                const data = await response.json();
+
+                setStep(3, 'done');
+                setStep(4, 'active');
+                await new Promise(r => setTimeout(r, 800));
+                setStep(4, 'done');
+
+                // Show report
+                const reportCard = document.getElementById('reportCard');
+                reportCard.style.display = 'block';
+
+                document.getElementById('reportMeta').innerHTML = `
+                <div class="badge">📁 ${data.file}</div>
+                <div class="badge">✅ Analysis Complete</div>
+            `;
+
+                document.getElementById('reportContent').textContent = data.report;
+
+                // Refresh reports list
+                loadReports();
+
+            } catch (error) {
+                showError(error.message);
+                for (let i = 1; i <= 4; i++) setStep(i, '');
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('analyzeBtn').textContent = 'Run Analysis';
+            }
+        }
+
+        async function loadReports() {
+            try {
+                const response = await fetch(`${API}/reports`);
+                const data = await response.json();
+                const list = document.getElementById('reportsList');
+
+                if (data.reports.length === 0) {
+                    list.innerHTML = '<li style="color: #3a5070;">No reports yet</li>';
+                    return;
+                }
+
+                list.innerHTML = data.reports
+                    .map(r => `<li>${r}</li>`)
+                    .join('');
+            } catch {
+                document.getElementById('reportsList').innerHTML =
+                    '<li style="color: #5c1a1a;">Could not connect to agent</li>';
+            }
+        }
+
+        loadReports();
+    </script>
+
+</body>
+
+</html>
